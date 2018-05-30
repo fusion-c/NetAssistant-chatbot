@@ -9,7 +9,7 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-import bs4
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -36,7 +36,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    #print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
+    print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
     content = "{}: {}".format(event.source.user_id, event.message.text)
     line_bot_api.reply_message(
         event.reply_token,
@@ -44,5 +44,4 @@ def handle_message(event):
 
 import os
 if __name__ == "__main__":
-    app.run()
-# app.run(host='0.0.0.0',port=os.environ['PORT'])
+    app.run(host='0.0.0.0',port=os.environ['PORT'])
