@@ -169,13 +169,6 @@ def checkRatio():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
-    if re.match("((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))", event.message.text):
-        ip = event.message.text.strip()
-        content = checkIPflow(ip)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content))
-        return 0
     if event.message.text == "24hr排行":
         content = checkTop24()
         line_bot_api.reply_message(
@@ -196,6 +189,13 @@ def handle_message(event):
         return 0
     if re.sub('\s', '', event.message.text) == "上傳下載比":
         content = checkRatio()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+    if re.match("((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))", event.message.text):
+        ip = event.message.text.strip()
+        content = checkIPflow(ip)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
