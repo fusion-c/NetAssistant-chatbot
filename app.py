@@ -176,7 +176,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
         return 0
-    if re.sub('\s', '', event.message.text) == "24hr排行":
+    if event.message.text == "24hr排行":
         content = checkTop24()
         line_bot_api.reply_message(
             event.reply_token,
