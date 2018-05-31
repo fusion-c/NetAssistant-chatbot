@@ -58,22 +58,50 @@ def checkIPflow(ip : str):
         l2 = s2
 
     l3 = zip(l2[1:], l1)
-    content = "24hr 總量"
+    content = "24hr 總量\n"
     for a,b in l3:
         content += '{}:\t\t{}\n'.format(a, b)
     return  content
+
+def checkTop24():
+    res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=top24")
+    res.encoding = "big5"
+    soup = bs(res.text, "lxml")
+
+    tab = soup.find('table', attrs={"border": "1", "cellspacing": "0", "cellpadding": "5"})
+    content = "最近 24 小時流量 (對校外上傳)十大 (單位: GB)\n"
+    content += "IP Add\t\t\t上傳(校外)\t下載(校外)\t上傳 (全部)\t下載(全部)\n全宿網\t\t\t"
+
+    count = 0
+    for tr in tab.findAll('tr'):
+        if count < 2:
+            count += 1
+            continue
+        elif count == 13:
+            break
+        for td in tr.findAll('td'):
+            content += td.getText().strip() + "\t\t"
+        content += "\n"
+        count += 1
+
+    return content
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
     if re.match("((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))",
                 event.message.text) :
-        ip = event.message.text
+        ip = event.message.text.strip()
         content = checkIPflow(ip)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
         return 0
+    if re.sub('\s', '', event.message.text) == "24hr排行":
+        content = checkTop24()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
 
 import os
 if __name__ == "__main__":

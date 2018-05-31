@@ -4,7 +4,7 @@
 
 目前支援指令，以及其說明：
 --------------------------------------------
-**<IP地址>：**直接查詢該IP最近24小時間的流量狀況
+**<IP地址>：** 直接查詢該IP最近24小時間的流量狀況
 
 ＊ [IP]:
 
@@ -27,4 +27,4 @@
 
 玩玩看： http://qr-official.line.me/L/kKRmte29sf.png
 
-Github: https://github.com/ntu-as-cooklab/line-bot
+Github: https://github.com/fusion-c/NetAssistant-chatbot
