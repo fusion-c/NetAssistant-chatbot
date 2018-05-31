@@ -96,7 +96,6 @@ def checkTop10():
 
     content = th.text
     content += "\nIP Add\t\t\t上傳(校外)\t下載(校外)\t上傳 (全部)\t下載(全部)\n全宿網\t\t\t"
-    content += "IP Add\t\t\t上傳(校外)\t下載(校外)\t上傳 (全部)\t下載(全部)\n全宿網\t\t\t"
 
     count = 0
     for tr in tab.findAll('tr'):
@@ -112,11 +111,65 @@ def checkTop10():
 
     return content
 
+def checkLimit():
+    res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=limit")
+    res.encoding = "big5"
+    soup = bs(res.text, "lxml")
+
+    tab = soup.find('table', attrs={"border": "1", "cellspacing": "0", "cellpadding": "5"})
+    tr = soup.find("tr", attrs={"bgcolor": "ffffbb"})
+
+    content = tr.text
+    content += "\nIP Address\t\t\t出校外上傳量\t佔總量比\t\t資料時間\t\n"
+
+    count = 0
+    for tr in tab.findAll('tr'):
+        if count < 2:
+            count += 1
+            continue
+        display = False
+        for td in tr.findAll('td'):
+            if display == True:
+                content += td.getText().strip() + "\t\t"
+            display = True
+        content += "\n"
+        count += 1
+
+    return content
+
+def checkRatio():
+    res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=ratio")
+    res.encoding = "big5"
+    soup = bs(res.text, "lxml")
+
+    tab = soup.find('table', attrs={"border": "1", "cellspacing": "0", "cellpadding": "5"})
+    tr = soup.find("tr", attrs={"bgcolor": "ffffbb"})
+
+    content = tr.text
+    content += "\nIP Address\t\t\t出校外上傳量\t\t出校外下載量\t\t比值\t\n"
+
+    count = 0
+    for tr in tab.findAll('tr'):
+        if count < 2:
+            count += 1
+            continue
+        if count == 13:
+            break
+        display = False
+        for td in tr.findAll('td'):
+            if display == True:
+                content += td.getText().strip() + "\t\t"
+            display = True
+        content += "\n"
+        count += 1
+
+    return content
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
-    if re.match("((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))",
-                event.message.text) :
+    if re.match("((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))", event.message.text):
         ip = event.message.text.strip()
         content = checkIPflow(ip)
         line_bot_api.reply_message(
@@ -128,11 +181,25 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
+        return 0
     if re.sub('\s', '', event.message.text) == "10min排行":
         content = checkTop10()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
+        return 0
+    if re.sub('\s', '', event.message.text) == "超量列表":
+        content = checkLimit()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+    if re.sub('\s', '', event.message.text) == "上傳下載比":
+        content = checkLimit()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
 
 import os
 if __name__ == "__main__":
