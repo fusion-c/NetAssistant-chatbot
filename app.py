@@ -195,7 +195,7 @@ def handle_message(event):
             TextSendMessage(text=content))
         return 0
     if re.sub('\s', '', event.message.text) == "上傳下載比":
-        content = checkLimit()
+        content = checkRatio()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
