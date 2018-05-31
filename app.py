@@ -86,6 +86,32 @@ def checkTop24():
 
     return content
 
+def checkTop10():
+    res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=top10")
+    res.encoding = "big5"
+    soup = bs(res.text, "lxml")
+
+    tab = soup.find('table', attrs={"border": "1", "cellspacing": "0", "cellpadding": "5"})
+    th = soup.find("th", attrs={"colspan": "5"})
+
+    content = th.text
+    content += "\nIP Add\t\t\t上傳(校外)\t下載(校外)\t上傳 (全部)\t下載(全部)\n全宿網\t\t\t"
+    content += "IP Add\t\t\t上傳(校外)\t下載(校外)\t上傳 (全部)\t下載(全部)\n全宿網\t\t\t"
+
+    count = 0
+    for tr in tab.findAll('tr'):
+        if count < 2:
+            count += 1
+            continue
+        elif count == 13:
+            break
+        for td in tr.findAll('td'):
+            content += td.getText().strip() + "\t\t"
+        content += "\n"
+        count += 1
+
+    return content
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
@@ -99,6 +125,11 @@ def handle_message(event):
         return 0
     if re.sub('\s', '', event.message.text) == "24hr排行":
         content = checkTop24()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    if re.sub('\s', '', event.message.text) == "10min排行":
+        content = checkTop10()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
