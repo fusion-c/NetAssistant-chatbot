@@ -36,6 +36,7 @@ def callback():
     return 'OK'
 
 def checkIPflow(ip : str):
+    print("Running in checkIPflow()")
     payload = {
         "ip": ip,
         "submit": "Submit"
@@ -64,6 +65,7 @@ def checkIPflow(ip : str):
     return  content
 
 def checkTop24():
+    print("Running in checkTop24()")
     res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=top24")
     res.encoding = "big5"
     soup = bs(res.text, "lxml")
@@ -87,6 +89,7 @@ def checkTop24():
     return content
 
 def checkTop10():
+    print("Running in checkTop10()")
     res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=top10")
     res.encoding = "big5"
     soup = bs(res.text, "lxml")
@@ -112,6 +115,7 @@ def checkTop10():
     return content
 
 def checkLimit():
+    print("Running in checkLimit()")
     res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=limit")
     res.encoding = "big5"
     soup = bs(res.text, "lxml")
@@ -138,6 +142,7 @@ def checkLimit():
     return content
 
 def checkRatio():
+    print("Running in checkRatio()")
     res = requests.post("https://uncia.cc.ncu.edu.tw/dormnet/index.php?section=netflow&sub=ratio")
     res.encoding = "big5"
     soup = bs(res.text, "lxml")
@@ -168,7 +173,8 @@ def checkRatio():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
+    print(", message: " + event.message.text)
+    # print("Handle: reply_token: " + event.reply_token + ", message: " + event.message.text)
     if event.message.text == "24hr排行":
         content = checkTop24()
         line_bot_api.reply_message(
